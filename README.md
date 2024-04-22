@@ -25,3 +25,5 @@ pip install numpy
 9. Wait until the process is finished, it may appear as it's stuck but it's not
 10. There should be created a folder called "output" where all frames are saved, outside the folder "grid_image.png" and "output_video.gif" should be created
 11. >profit
+
+## There's no user input failstates implemented yet so if something doesn't seem right just press ctrl + c
