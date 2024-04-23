@@ -52,6 +52,10 @@ def glue_frames_into_grid_from_folder():
 
     total_frames = len(frames)
     
+    if (total_frames == 0):
+        logbox.insert(tk.CURRENT, f"No frames to make a spritesheet in {input_dir}"+"\n")
+        return
+    
     # Calculate grid dimensions nxn
     initial_size = math.floor(math.sqrt(total_frames))
     
@@ -130,6 +134,10 @@ def glue_frames_into_grid():
     global output_image_path
     total_frames = len(frames)
     
+    if (total_frames == 0):
+        logbox.insert(tk.CURRENT, f"No sliced frames to make a spritsheet with\n")
+        return
+    
     # Calculate grid dimensions nxn
     initial_size = math.floor(math.sqrt(total_frames))
     
@@ -161,6 +169,9 @@ def glue_frames_into_grid():
     
 def frames_to_gif(fps=60):
     global frames
+    if (len(frames) == 0):
+        logbox.insert(tk.CURRENT, f"No sliced frames to make a gif with\n")
+        return
     
     def make_frame(t):
         frame_index = int(t * fps)
