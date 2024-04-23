@@ -205,6 +205,9 @@ def loadVideo():
         logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
         return
     
+    #Preview
+    
+    
     #///////////////////////////// I don't have enough time to implement this today so here's a plan of what i wanted to do
     #1. Make a slicedImageCLip
     #2. crate temp folder and saved it there (tkVideoPlayer probably doesn't allow to play videos from objects so we have to save it and take it's path)
@@ -296,7 +299,7 @@ labelEndTime = customtkinter.CTkLabel(master=root, text="End time")
 labelEndTime.place(relx=0.85,y=30, rely=0.5, anchor=tk.CENTER)
 # TextBox for Logs
 logbox = customtkinter.CTkTextbox(master = root, width = 500, height = 150)
-logbox.place(relx=0.5, rely=0.85, anchor=tk.CENTER)
+logbox.place(relx=0.5, rely=0.855, anchor=tk.CENTER)
 # Preview
 previewImageStart = customtkinter.CTkImage(light_image=Image.new(mode="RGB", size=(250, 220)),
                                     size=(250, 220))
