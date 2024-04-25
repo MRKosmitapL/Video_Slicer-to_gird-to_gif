@@ -312,4 +312,12 @@ previewEndLabel = customtkinter.CTkLabel(master=root, image=previewImageEnd, tex
 previewEndLabel.place(x=-125,relx=1, rely=0.25, anchor=tk.CENTER)
 #//////////////////////////////////////////////////////////////////////////// MAIN
 
+
+
+#////////////// Just in case cuz it might be needed in the future
+#def on_closing():
+#    root.destroy()
+#root.protocol("WM_DELETE_WINDOW", on_closing) 
+#////////////////////////////////////////////////////////////////
+
 root.mainloop()
