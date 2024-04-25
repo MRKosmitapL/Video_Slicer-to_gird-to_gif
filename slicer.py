@@ -5,7 +5,7 @@ from tkinter import filedialog
 from tkinter.messagebox import showinfo
 import customtkinter  # <- import the CustomTkinter module
 #from tkVideoPlayer import TkinterVideo
-from PIL import Image
+from PIL import Image, ImageTk
 
 from moviepy.editor import VideoFileClip, VideoClip, ImageClip
 import math
@@ -189,6 +189,8 @@ def frames_to_gif(fps=60):
 #//////////////////////////////////////////////////////////////////////////// BUTTONS
 def loadVideo():
     global video_path
+    global frames
+    frames.clear()
     video_path = filedialog.askopenfilename(
         title="Select Video", filetypes=[("Videos", ".webm .mp4 .gif")]
     )
@@ -233,14 +235,29 @@ def loadVideo():
     logbox.insert(tk.CURRENT, "Loaded video =" + video_path+"\n")
     
 def create_preview():
+    global frames
+    maxsize = (250,220)
     if not os.path.exists(preview_path):
         os.makedirs(preview_path)
     if not os.path.exists(preview_path+"/start.png"):
-        image = Image.new(mode="RGB", size=(250, 220))
-        image.save(preview_path+"/start.png")
+            image = Image.new(mode="RGB", size=maxsize)
+            if frames != None:
+                image.paste(frames[0].resize(maxsize))
+            image.save(preview_path+"/start.png")
     if not os.path.exists(preview_path+"/end.png"):
-        image = Image.new(mode="RGB", size=(250, 220))
+        image = Image.new(mode="RGB", size=maxsize)
         image.save(preview_path+"/end.png")
+        
+    if frames != None:
+        #Override first image
+        image = Image.open(preview_path+"/start.png")
+        image.paste(frames[0].resize(maxsize))
+        image.save(preview_path+"/start.png")
+        #Override second image
+        image = Image.open(preview_path+"/end.png")
+        image.paste(frames[-1].resize(maxsize))
+        image.save(preview_path+"/end.png")
+        
     #Override images
     previewImageStart.configure(light_image=Image.open(preview_path+"/start.png"))
     previewImageEnd.configure(light_image=Image.open(preview_path+"/end.png"))
