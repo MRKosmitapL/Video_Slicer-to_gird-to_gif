@@ -5,11 +5,10 @@ from tkinter import filedialog
 from tkinter.messagebox import showinfo
 import customtkinter  # <- import the CustomTkinter module
 #from tkVideoPlayer import TkinterVideo
-from PIL import Image, ImageTk
+from PIL import Image
 
 from moviepy.editor import VideoFileClip, VideoClip, ImageClip
 import math
-from PIL import Image
 import numpy as np
 
 root = tk.Tk()  # create the Tk window like you normally do
@@ -88,12 +87,10 @@ def glue_frames_into_grid_from_folder():
 def slice_and_save_frames():
     
     start_time, end_time = handle_time_inputs()
-    print(start_time," ", end_time)
     if (start_time == 0 == end_time):
         return
     
     clip = handle_video_input()
-    print(clip)
     if (clip == False):
         return
     
@@ -118,7 +115,7 @@ def slice_and_save_frames():
         frame = Image.open(image_path)
         frames.append(frame)
     
-    logbox.insert(tk.CURRENT, f"Saved {num_frames} frames to {output_dir}"+"\n")
+    logbox.insert(tk.CURRENT, f"Saved {num_frames} frames [{start_time}-{end_time}] to {output_dir}\n")
 
 def glue_frames_into_grid():
     global frames
@@ -247,41 +244,23 @@ def handle_video_input():
 def create_preview():
     
     start_time, end_time = handle_time_inputs()
-    print(start_time," ", end_time)
     if (start_time == 0 == end_time):
         return
     
     clip = handle_video_input()
-    print(clip)
     if (clip == False):
         return
-    
-    global frames
+    logbox.insert(tk.CURRENT, f"Preview: [{start_time}-{end_time}]\n")
     
     maxsize = (250,220)
     if not os.path.exists(preview_path):
         os.makedirs(preview_path)
-    if not os.path.exists(preview_path+"/start.png"):
-            image = Image.new(mode="RGB", size=maxsize)
-            if frames != None:
-                image.paste(frames[0].resize(maxsize))
-            image.save(preview_path+"/start.png")
-    if not os.path.exists(preview_path+"/end.png"):
-        image = Image.new(mode="RGB", size=maxsize)
-        image.save(preview_path+"/end.png")
-        
-        
-    if frames != None:
-        #Override first image
-        image = Image.open(preview_path+"/start.png")
-        image.paste(frames[0].resize(maxsize))
-        image.save(preview_path+"/start.png")
-        #Override second image
-        image = Image.open(preview_path+"/end.png")
-        image.paste(frames[-1].resize(maxsize))
-        image.save(preview_path+"/end.png")
-        
-    #Override images
+    
+    # Save start-end images of specified interval into /preview
+    
+    clip.save_frame(preview_path+"/start.png", t = start_time)
+    clip.save_frame(preview_path+"/end.png", t = end_time)
+    #Override tk images
     previewImageStart.configure(light_image=Image.open(preview_path+"/start.png"))
     previewImageEnd.configure(light_image=Image.open(preview_path+"/end.png"))
 
