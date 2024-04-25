@@ -86,6 +86,8 @@ def glue_frames_into_grid_from_folder():
     logbox.insert(tk.CURRENT, f"Saved grid image to {output_image_path}"+"\n")
     
 def slice_and_save_frames():
+    global frames
+    frames.clear()
     try:
         start_time = float(editStartTime.get()) #(seconds)
         end_time = float(editEndTime.get()) #(seconds)
@@ -118,7 +120,6 @@ def slice_and_save_frames():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    global frames
     
     for i in range(num_frames):
         frame_time = start_time + i / fps
