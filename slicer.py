@@ -86,29 +86,19 @@ def glue_frames_into_grid_from_folder():
     logbox.insert(tk.CURRENT, f"Saved grid image to {output_image_path}"+"\n")
     
 def slice_and_save_frames():
+    
+    start_time, end_time = handle_time_inputs()
+    print(start_time," ", end_time)
+    if (start_time == 0 == end_time):
+        return
+    
+    clip = handle_video_input()
+    print(clip)
+    if (clip == False):
+        return
+    
     global frames
     frames.clear()
-    try:
-        start_time = float(editStartTime.get()) #(seconds)
-        end_time = float(editEndTime.get()) #(seconds)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
-        return
-    
-    if (start_time == end_time):
-        logbox.insert(tk.CURRENT, "Start time = end time. Zero frames"+"\n")
-        return
-    #Heavier so I put it lower
-    try:
-        clip = VideoFileClip(video_path)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Video Path"+"\n")
-        return  
-    
-    if (start_time > end_time):
-        z = start_time
-        start_time = end_time
-        end_time = z
     
     sliced_clip = clip.subclip(start_time, end_time)
     
@@ -199,14 +189,6 @@ def loadVideo():
         labelFile.configure(text="Video not chosen")
     else:
         labelFile.configure(text=os.path.basename(video_path).split("/")[-1])
-        buttonSliceAndSave.configure(state = "normal")
-        
-    try:
-        start_time = float(editStartTime.get()) #start time (seconds)
-        end_time = float(editEndTime.get()) #end time (seconds)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
-        return
     
     #Preview
     
@@ -234,9 +216,48 @@ def loadVideo():
    #print(sliced_clip)
     
     logbox.insert(tk.CURRENT, "Loaded video =" + video_path+"\n")
+
+def handle_time_inputs():
+    try:
+        start_time = float(editStartTime.get()) #(seconds)
+        end_time = float(editEndTime.get()) #(seconds)
+        
+        if (start_time == end_time):
+            logbox.insert(tk.CURRENT, "Start time = end time. Zero frames"+"\n")
+            return (0, 0)
+        
+        if (start_time > end_time):
+            z = start_time
+            start_time = end_time
+            end_time = z
+        
+        return (start_time, end_time)
+    except:
+        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
+        return (0, 0)
     
+def handle_video_input():
+    try:
+        clip = VideoFileClip(video_path)
+        return clip
+    except:
+        logbox.insert(tk.CURRENT, "Incorrect Video Path"+"\n")
+        return False
+
 def create_preview():
+    
+    start_time, end_time = handle_time_inputs()
+    print(start_time," ", end_time)
+    if (start_time == 0 == end_time):
+        return
+    
+    clip = handle_video_input()
+    print(clip)
+    if (clip == False):
+        return
+    
     global frames
+    
     maxsize = (250,220)
     if not os.path.exists(preview_path):
         os.makedirs(preview_path)
@@ -248,6 +269,7 @@ def create_preview():
     if not os.path.exists(preview_path+"/end.png"):
         image = Image.new(mode="RGB", size=maxsize)
         image.save(preview_path+"/end.png")
+        
         
     if frames != None:
         #Override first image
