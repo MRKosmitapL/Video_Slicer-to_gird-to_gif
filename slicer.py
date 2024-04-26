@@ -5,11 +5,10 @@ from tkinter import filedialog
 from tkinter.messagebox import showinfo
 import customtkinter  # <- import the CustomTkinter module
 #from tkVideoPlayer import TkinterVideo
-from PIL import Image, ImageTk
+from PIL import Image
 
 from moviepy.editor import VideoFileClip, VideoClip, ImageClip
 import math
-from PIL import Image
 import numpy as np
 
 root = tk.Tk()  # create the Tk window like you normally do
@@ -86,29 +85,17 @@ def glue_frames_into_grid_from_folder():
     logbox.insert(tk.CURRENT, f"Saved grid image to {output_image_path}"+"\n")
     
 def slice_and_save_frames():
+    
+    start_time, end_time = handle_time_inputs()
+    if (start_time == 0 == end_time):
+        return
+    
+    clip = handle_video_input()
+    if (clip == False):
+        return
+    
     global frames
     frames.clear()
-    try:
-        start_time = float(editStartTime.get()) #(seconds)
-        end_time = float(editEndTime.get()) #(seconds)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
-        return
-    
-    if (start_time == end_time):
-        logbox.insert(tk.CURRENT, "Start time = end time. Zero frames"+"\n")
-        return
-    #Heavier so I put it lower
-    try:
-        clip = VideoFileClip(video_path)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Video Path"+"\n")
-        return  
-    
-    if (start_time > end_time):
-        z = start_time
-        start_time = end_time
-        end_time = z
     
     sliced_clip = clip.subclip(start_time, end_time)
     
@@ -128,7 +115,7 @@ def slice_and_save_frames():
         frame = Image.open(image_path)
         frames.append(frame)
     
-    logbox.insert(tk.CURRENT, f"Saved {num_frames} frames to {output_dir}"+"\n")
+    logbox.insert(tk.CURRENT, f"Saved {num_frames} frames [{start_time}-{end_time}] to {output_dir}\n")
 
 def glue_frames_into_grid():
     global frames
@@ -199,14 +186,6 @@ def loadVideo():
         labelFile.configure(text="Video not chosen")
     else:
         labelFile.configure(text=os.path.basename(video_path).split("/")[-1])
-        buttonSliceAndSave.configure(state = "normal")
-        
-    try:
-        start_time = float(editStartTime.get()) #start time (seconds)
-        end_time = float(editEndTime.get()) #end time (seconds)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
-        return
     
     #Preview
     
@@ -234,32 +213,54 @@ def loadVideo():
    #print(sliced_clip)
     
     logbox.insert(tk.CURRENT, "Loaded video =" + video_path+"\n")
+
+def handle_time_inputs():
+    try:
+        start_time = float(editStartTime.get()) #(seconds)
+        end_time = float(editEndTime.get()) #(seconds)
+        
+        if (start_time == end_time):
+            logbox.insert(tk.CURRENT, "Start time = end time. Zero frames"+"\n")
+            return (0, 0)
+        
+        if (start_time > end_time):
+            z = start_time
+            start_time = end_time
+            end_time = z
+        
+        return (start_time, end_time)
+    except:
+        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
+        return (0, 0)
     
+def handle_video_input():
+    try:
+        clip = VideoFileClip(video_path)
+        return clip
+    except:
+        logbox.insert(tk.CURRENT, "Incorrect Video Path"+"\n")
+        return False
+
 def create_preview():
-    global frames
+    
+    start_time, end_time = handle_time_inputs()
+    if (start_time == 0 == end_time):
+        return
+    
+    clip = handle_video_input()
+    if (clip == False):
+        return
+    logbox.insert(tk.CURRENT, f"Preview: [{start_time}-{end_time}]\n")
+    
     maxsize = (250,220)
     if not os.path.exists(preview_path):
         os.makedirs(preview_path)
-    if not os.path.exists(preview_path+"/start.png"):
-            image = Image.new(mode="RGB", size=maxsize)
-            if frames != None:
-                image.paste(frames[0].resize(maxsize))
-            image.save(preview_path+"/start.png")
-    if not os.path.exists(preview_path+"/end.png"):
-        image = Image.new(mode="RGB", size=maxsize)
-        image.save(preview_path+"/end.png")
-        
-    if frames != None:
-        #Override first image
-        image = Image.open(preview_path+"/start.png")
-        image.paste(frames[0].resize(maxsize))
-        image.save(preview_path+"/start.png")
-        #Override second image
-        image = Image.open(preview_path+"/end.png")
-        image.paste(frames[-1].resize(maxsize))
-        image.save(preview_path+"/end.png")
-        
-    #Override images
+    
+    # Save start-end images of specified interval into /preview
+    
+    clip.save_frame(preview_path+"/start.png", t = start_time)
+    clip.save_frame(preview_path+"/end.png", t = end_time)
+    #Override tk images
     previewImageStart.configure(light_image=Image.open(preview_path+"/start.png"))
     previewImageEnd.configure(light_image=Image.open(preview_path+"/end.png"))
 
@@ -329,5 +330,13 @@ previewStartLabel.place(x=125, rely=0.25, anchor=tk.CENTER)
 previewEndLabel = customtkinter.CTkLabel(master=root, image=previewImageEnd, text="") 
 previewEndLabel.place(x=-125,relx=1, rely=0.25, anchor=tk.CENTER)
 #//////////////////////////////////////////////////////////////////////////// MAIN
+
+
+
+#////////////// Just in case cuz it might be needed in the future
+#def on_closing():
+#    root.destroy()
+#root.protocol("WM_DELETE_WINDOW", on_closing) 
+#////////////////////////////////////////////////////////////////
 
 root.mainloop()
