@@ -35,7 +35,7 @@ clip = None
 #Make spritesheets and gifs out of certain files in the folder (n,n+1,n+2..n+x).png????
 
 # Current Troubles:
-# Video length 60. Inputs: 43 - 44.
+# Video length 60. Inputs: 43 - 44. FIXED
 # OSError: MoviePy error: failed to read the first frame of video file video.mp4.
 # you are using a deprecated version of FFMPEG. On Ubuntu/Debian for instance the version 
 # in the repos is deprecated. Please update to a recent version from the website.
@@ -100,18 +100,14 @@ def slice_and_save_frames():
     if (start_time == end_time):
         logbox.insert(tk.CURRENT, "Start time = end time. Zero frames"+"\n")
         return
-    #Heavier so I put it lower
     
     if (start_time > end_time):
         z = start_time
         start_time = end_time
         end_time = z
     
-    sliced_clip = clip.subclip(start_time, end_time)
-    duration = sliced_clip.duration
-    print(start_time, end_time,duration)
-    
-    fps = sliced_clip.fps
+    duration = end_time - start_time
+    fps = clip.fps
     num_frames = int(duration * fps)
     
     if not os.path.exists(output_dir):
@@ -119,15 +115,16 @@ def slice_and_save_frames():
 
     
     for i in range(num_frames):
-        frame_time = start_time + i / fps
+        frame_time = start_time + i/fps
         image_path = os.path.join(output_dir, f"frame_{i:04d}.png")
-        sliced_clip.save_frame(image_path, t=frame_time)
+        clip.save_frame(image_path, t=frame_time)
         frame = Image.open(image_path)
         frames.append(frame)
     
     logbox.insert(tk.CURRENT, f"Saved {num_frames} frames to {output_dir}"+"\n")
 
 def glue_frames_into_grid():
+    
     global frames
     global output_image_path
     total_frames = len(frames)
