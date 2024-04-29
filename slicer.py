@@ -168,17 +168,19 @@ def frames_to_gif(fps=60):
         logbox.insert(tk.CURRENT, f"No sliced frames to make a gif with\n")
         return
     
-    def make_frame(t):
-        frame_index = int(t * fps)
-        if frame_index < len(frames):
-            frame = np.array(frames[frame_index])
-            return frame
-        else:
-            return np.array(frames[-1])
+    #def make_frame(t):
+    #    frame_index = int(t * fps)
+    #    if frame_index < len(frames):
+    #        frame = np.array(frames[frame_index])
+    #        return frame
+    #    else:
+    #        return np.array(frames[-1])
     
-    clipGif = VideoClip(make_frame, duration=len(frames)/fps)
-    clipGif.write_gif(output_gif_path, fps=fps)
-    
+    #clipGif = VideoClip(make_frame, duration=len(frames)/fps)
+    #clipGif.write_gif(output_gif_path, fps=fps)
+    first_frame = frames[0]
+    first_frame.save(fp=output_gif_path, format='GIF', append_images=frames, save_all=True, duration=1, loop=0)
+        
     logbox.insert(tk.CURRENT, f"Saved GIF to {output_gif_path}"+"\n")
 
 #//////////////////////////////////////////////////////////////////////////// BUTTONS
@@ -201,38 +203,6 @@ def loadVideo():
     except:
         logbox.insert(tk.CURRENT, "Incorrect Video Path"+"\n")
         return  
-        
-    try:
-        start_time = float(editStartTime.get()) #start time (seconds)
-        end_time = float(editEndTime.get()) #end time (seconds)
-    except:
-        logbox.insert(tk.CURRENT, "Incorrect Time Input"+"\n")
-        return
-    
-    #Preview
-    
-    
-    #///////////////////////////// I don't have enough time to implement this today so here's a plan of what i wanted to do
-    #1. Make a slicedImageCLip
-    #2. crate temp folder and saved it there (tkVideoPlayer probably doesn't allow to play videos from objects so we have to save it and take it's path)
-    #3. Play preview in this windows (or separated idk)
-    #4. When program closes delete temp folder and temp video
-    # But the sliced .gif - .mp4 conversion doesn't work, it returns correct duration of video but the content is missing
-    
-    #if not os.path.exists("./tempdir"):
-    #    os.makedirs("./tempdir")
-        
-    #clip = ImageClip(video_path)
-    #sliced_clip = clip.subclip(start_time, end_time)
-    #sliced_clip.set_duration(end_time-start_time)
-    #sliced_clip.write_videofile("movie.mp4", fps=24, codec='mpeg4')
-    #video_player = TkinterVideo(master=root, scaled=True)
-    #video_player.load(sliced_clip)
-    #video_player.pack(expand=True, fill="both")
-    #video_player.play()
-    #player = tkvideo(sliced_clip,"test", loop = 1, size = (1280,720))
-    #player.play()
-   #print(sliced_clip)
     
     logbox.insert(tk.CURRENT, "Loaded video =" + video_path+"\n")
     
