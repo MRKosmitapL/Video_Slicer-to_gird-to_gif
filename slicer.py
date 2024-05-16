@@ -13,11 +13,13 @@ from PIL import Image
 import numpy as np
 
 root = tk.Tk()  # create the Tk window like you normally do
-root.geometry("500x550")
+root.geometry("500x650")
 root.minsize(500, 550)
 root.resizable(width=False, height=False)
 root.title("V1dE0 Slicer")
 
+
+SpriteSheetFormat = ".png"
 video_path = "empty"  # Imported file path
 output_dir = "./output"
 output_image_path = "./Grid.png"
@@ -116,7 +118,7 @@ def slice_and_save_frames():
     
     for i in range(num_frames):
         frame_time = start_time + i/fps
-        image_path = os.path.join(output_dir, f"frame_{i:04d}.png")
+        image_path = os.path.join(output_dir, f"frame_{i:04d}.jpg")
         clip.save_frame(image_path, t=frame_time)
         frame = Image.open(image_path)
         frames.append(frame)
@@ -208,34 +210,42 @@ def loadVideo():
     
 def create_preview():
     global frames
+    global SpriteSheetFormat
     maxsize = (250,220)
     if not os.path.exists(preview_path):
         os.makedirs(preview_path)
-    if not os.path.exists(preview_path+"/start.png"):
+    if not os.path.exists(preview_path+"/start"+SpriteSheetFormat):
             image = Image.new(mode="RGB", size=maxsize)
             if frames != None:
                 image.paste(frames[0].resize(maxsize))
-            image.save(preview_path+"/start.png")
-    if not os.path.exists(preview_path+"/end.png"):
+            image.save(preview_path+"/start"+SpriteSheetFormat)
+    if not os.path.exists(preview_path+"/end"+SpriteSheetFormat):
         image = Image.new(mode="RGB", size=maxsize)
-        image.save(preview_path+"/end.png")
+        image.save(preview_path+"/end"+SpriteSheetFormat)
         
     if frames != None:
         #Override first image
-        image = Image.open(preview_path+"/start.png")
+        image = Image.open(preview_path+"/start.jpg")
         image.paste(frames[0].resize(maxsize))
-        image.save(preview_path+"/start.png")
+        image.save(preview_path+"/start.jpg")
         #Override second image
-        image = Image.open(preview_path+"/end.png")
+        image = Image.open(preview_path+"/end.jpg")
         image.paste(frames[-1].resize(maxsize))
-        image.save(preview_path+"/end.png")
+        image.save(preview_path+"/end.jpg")
         
     #Override images
-    previewImageStart.configure(light_image=Image.open(preview_path+"/start.png"))
-    previewImageEnd.configure(light_image=Image.open(preview_path+"/end.png"))
+    previewImageStart.configure(light_image=Image.open(preview_path+"/start.jpg"))
+    previewImageEnd.configure(light_image=Image.open(preview_path+"/end.jpg"))
 
     previewStartLabel.image = previewImageStart
     previewEndLabel.image = previewImageEnd
+    
+def get_radio_value():
+    global SpriteSheetFormat
+    global output_image_path
+    SpriteSheetFormat = formatVar.get()
+    output_image_path = "./Grid"+SpriteSheetFormat
+    print(SpriteSheetFormat, output_image_path)
     
 # Use CTkButton instead of tkinter Button
 #//////////////////////////////////////////////////////////////////////////// INTERFACE
@@ -286,9 +296,22 @@ labelStartTime = customtkinter.CTkLabel(master=root, text="Start time")
 labelStartTime.place(relx=0.15,y=30, rely=0.5, anchor=tk.CENTER)
 labelEndTime = customtkinter.CTkLabel(master=root, text="End time")
 labelEndTime.place(relx=0.85,y=30, rely=0.5, anchor=tk.CENTER)
+
+#RadioButtons to choose spritesheet format png/jpg
+formatLabel = customtkinter.CTkLabel(root, text="Select Spritesheet format", bg_color="#3B8ED0", text_color="#ffffff", corner_radius=10, font=thickFont)
+formatLabel.place(relx=0.215, y=30, rely=0.68, anchor=tk.CENTER)
+formatVar = customtkinter.StringVar(value=".png")
+#png
+formatRad1 = customtkinter.CTkRadioButton(root, text=".png", value=".png", variable=formatVar, command=get_radio_value, bg_color="#3B8ED0", text_color="#ffffff",fg_color="#ffffff", radiobutton_height=12, radiobutton_width=12, width=50, height=25)
+formatRad1.place(relx=0.5,y=30, rely=0.68, anchor=tk.CENTER)
+#jpg
+formatRad2 = customtkinter.CTkRadioButton(root, text=".jpg", value=".jpg", variable=formatVar, command=get_radio_value, bg_color="#3B8ED0", text_color="#ffffff",fg_color="#ffffff", radiobutton_height=12, radiobutton_width=12, width=50, height=25)
+formatRad2.place(relx=0.65,y=30, rely=0.68, anchor=tk.CENTER)
+
 # TextBox for Logs
 logbox = customtkinter.CTkTextbox(master = root, width = 500, height = 150)
-logbox.place(relx=0.5, rely=0.855, anchor=tk.CENTER)
+logbox.place(relx=0.5, rely=0.87, anchor=tk.CENTER)
+
 # Preview
 previewImageStart = customtkinter.CTkImage(light_image=Image.new(mode="RGB", size=(250, 220)),
                                     size=(250, 220))
