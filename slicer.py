@@ -22,7 +22,7 @@ root.title("V1dE0 Slicer")
 SpriteSheetFormat = ".png"
 video_path = "empty"  # Imported file path
 output_dir = "./output"
-output_image_path = "./Grid.png"
+output_image_path = "./Grid"
 output_gif_path = "./GIF.gif"
 preview_path = "./preview"
 input_dir = "./input"
@@ -161,7 +161,10 @@ def glue_frames_into_grid():
         y = row * frame_height
         grid_image.paste(frames[i], (x, y))
     
-    grid_image.save(output_image_path)
+    print(x, y)
+    print("------------------------------")
+    
+    grid_image.save(output_image_path+f"_{int(grid_image.width/frame_width)}_{int(grid_image.height/frame_height)}_{total_frames}"+SpriteSheetFormat)
     logbox.insert(tk.CURRENT, f"Saved grid image to {output_image_path}"+"\n")
     
 def frames_to_gif(fps=60):
@@ -225,17 +228,17 @@ def create_preview():
         
     if frames != None:
         #Override first image
-        image = Image.open(preview_path+"/start.jpg")
+        image = Image.open(preview_path+"/start"+SpriteSheetFormat)
         image.paste(frames[0].resize(maxsize))
-        image.save(preview_path+"/start.jpg")
+        image.save(preview_path+"/start"+SpriteSheetFormat)
         #Override second image
-        image = Image.open(preview_path+"/end.jpg")
+        image = Image.open(preview_path+"/end"+SpriteSheetFormat)
         image.paste(frames[-1].resize(maxsize))
-        image.save(preview_path+"/end.jpg")
+        image.save(preview_path+"/end"+SpriteSheetFormat)
         
     #Override images
-    previewImageStart.configure(light_image=Image.open(preview_path+"/start.jpg"))
-    previewImageEnd.configure(light_image=Image.open(preview_path+"/end.jpg"))
+    previewImageStart.configure(light_image=Image.open(preview_path+"/start"+SpriteSheetFormat))
+    previewImageEnd.configure(light_image=Image.open(preview_path+"/end"+SpriteSheetFormat))
 
     previewStartLabel.image = previewImageStart
     previewEndLabel.image = previewImageEnd
