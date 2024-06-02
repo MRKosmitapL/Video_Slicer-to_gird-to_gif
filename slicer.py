@@ -85,7 +85,7 @@ def glue_frames_into_grid_from_folder():
         y = row * frame_height
         grid_image.paste(frames[i], (x, y))
     
-    grid_image.save(output_image_path)
+    grid_image.save(output_image_path+f"_{int(grid_image.width/frame_width)}_{int(grid_image.height/frame_height)}_{total_frames}"+SpriteSheetFormat)
     logbox.insert(tk.CURRENT, f"Saved grid image to {output_image_path}"+"\n")
     
 def slice_and_save_frames():
